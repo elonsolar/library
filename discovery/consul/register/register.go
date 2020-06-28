@@ -25,7 +25,7 @@ func Register(engine *gin.Engine) {
 	}
 	register.register()
 	register.check()
-	register.consuleClient.Agent().Services()
+	//register.consuleClient.Agent().Services()
 	go func() {
 		engine.GET("/check", func(ctx *gin.Context) {
 			ctx.JSON(200, map[string]string{"status": "ok"})
