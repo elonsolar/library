@@ -3,9 +3,9 @@ package config
 import (
 	"fmt"
 	"github.com/BurntSushi/toml"
-	"github.com/cxqlkk/go-library/discovery/consul/env"
-	"github.com/cxqlkk/go-library/encode"
-	"github.com/cxqlkk/go-library/log"
+	"github.com/cxqlkk/library/discovery/consul/env"
+	"github.com/cxqlkk/library/encode"
+	"github.com/cxqlkk/library/log"
 	consulapi "github.com/hashicorp/consul/api"
 	"go.uber.org/zap"
 	"os"

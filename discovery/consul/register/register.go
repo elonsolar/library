@@ -2,8 +2,8 @@ package register
 
 import (
 	"fmt"
-	"github.com/cxqlkk/go-library/discovery/consul/config"
-	"github.com/cxqlkk/go-library/discovery/consul/env"
+	"github.com/cxqlkk/library/discovery/consul/config"
+	"github.com/cxqlkk/library/discovery/consul/env"
 	"github.com/fvbock/endless"
 	"github.com/gin-gonic/gin"
 	consulapi "github.com/hashicorp/consul/api"

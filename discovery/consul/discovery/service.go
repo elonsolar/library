@@ -2,9 +2,9 @@ package discovery
 
 import (
 	"fmt"
-	"github.com/cxqlkk/go-library/discovery/consul/config"
-	"github.com/cxqlkk/go-library/encode"
-	"github.com/cxqlkk/go-library/log"
+	"github.com/cxqlkk/library/discovery/consul/config"
+	"github.com/cxqlkk/library/encode"
+	"github.com/cxqlkk/library/log"
 	"github.com/hashicorp/consul/api"
 	"go.uber.org/zap"
 	"strconv"
