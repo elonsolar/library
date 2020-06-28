@@ -1,12 +1,14 @@
 package discovery
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/cxqlkk/library/discovery/consul/config"
-	"github.com/cxqlkk/library/encode"
 	"github.com/cxqlkk/library/log"
 	"github.com/hashicorp/consul/api"
 	"go.uber.org/zap"
+	"net/http"
+	"net/url"
 	"strconv"
 	"sync/atomic"
 	"time"
@@ -24,7 +26,7 @@ type Service struct {
 	lastIndex    uint64
 }
 
-func NewService()*Service {
+func NewService() *Service {
 	var srv = &Service{
 		value:        atomic.Value{},
 		consulClient: config.GetConsulClient(),
@@ -36,12 +38,33 @@ func NewService()*Service {
 	return srv
 }
 
-func (srv *Service) GetService(serviceName string) (addr string, err error) {
+func (srv *Service) Proxy(serviceName, path string, rw http.ResponseWriter, req *http.Request) error {
 	services := srv.value.Load().(map[string]string)
 	if addr, ok := services[serviceName]; ok {
-		return addr, nil
+		if remote, err := url.Parse(addr); err != nil {
+			log.Logger.Error("srv.Proxy() 服务地址解析失败:", zap.Error(fmt.Errorf("serverName:%s addr:%s %w", serviceName, addr, err)))
+			return err
+		} else {
+			req.URL.Path = path
+			proxy := NewSingleHostReverseProxy(remote)
+			proxy.ErrorHandler = func(writer http.ResponseWriter, request *http.Request, e error) {
+				log.Logger.Error("srv.Proxy()",zap.Error(err))
+				writer.WriteHeader(200)
+				json.NewEncoder(writer).Encode(map[string]interface{}{
+					"error_code":1005,
+					"message":fmt.Printf("服务访问错误:servername:%s,serveraddr:%s,err:%s",serviceName,addr,e.Error()),
+				})
+			}
+			proxy.ServeHTTP(rw,req)
+			return nil
+		}
 	}
-	return "", encode.ServiceNotFound
+	log.Logger.Error("srv.Proxy()", zap.Error(fmt.Errorf("%s", "服务不存在")))
+	return fmt.Errorf("%s", "服务不存在")
+}
+func (srv *Service) proxy(addr, path string, rw http.ResponseWriter, req *http.Request) error {
+
+	return nil
 }
 
 func (srv *Service) initService() (err error) {
@@ -57,12 +80,12 @@ func (srv *Service) initService() (err error) {
 	return err
 }
 func (srv *Service) loadServices(serves map[string][]string) (err error) {
-	var serviceMap= map[string]string{}
+	var serviceMap = map[string]string{}
 	for k, _ := range serves {
 		if entry, _, err := srv.consulClient.Health().Service(k, "", true, nil); err != nil {
 			log.Logger.Error("srv.loadServices()", zap.Error(err))
 			return err
-		} else if len(entry)>0 {
+		} else if len(entry) > 0 {
 			//todo fixme
 			fmt.Println(entry[0].Service.Address,
 				entry[0].Service.Port)
@@ -87,4 +110,3 @@ func (srv *Service) serviceCheck() {
 	}
 
 }
-
