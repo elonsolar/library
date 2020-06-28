@@ -87,9 +87,7 @@ func (srv *Service) loadServices(serves map[string][]string) (err error) {
 			return err
 		} else if len(entry) > 0 {
 			//todo fixme
-			fmt.Println(entry[0].Service.Address,
-				entry[0].Service.Port)
-			serviceMap[k] = entry[0].Service.Address + ":" + strconv.Itoa(entry[0].Service.Port)
+			serviceMap[k] = "http://"+entry[0].Service.Address + ":" + strconv.Itoa(entry[0].Service.Port)
 		}
 	}
 	srv.value.Store(serviceMap)
