@@ -3,7 +3,7 @@ package config
 import (
 	"flag"
 	"fmt"
-	"github.com/cxqlkk/go-library/discovery/consul/env"
+	"github.com/cxqlkk/library/discovery/consul/env"
 	"github.com/fvbock/endless"
 	"github.com/gin-gonic/gin"
 
@@ -25,8 +25,8 @@ type Conf struct {
 func TestConfig(t *testing.T) {
 
 	flag.Parse()
-	var c = Conf{}
-	RemoteConfig(&c)
+	var c =&Conf{}
+	RemoteConfig(c)
 	fmt.Println(c)
 
 	select {}
