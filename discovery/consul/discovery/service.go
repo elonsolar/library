@@ -105,6 +105,7 @@ func (srv *Service) serviceCheck() {
 				log.Logger.Error("srv.serviceCheck()", zap.Error(err))
 			} else if meta.LastIndex != srv.lastIndex {
 				srv.loadServices(services)
+				srv.lastIndex=meta.LastIndex
 			}
 		}
 	}
