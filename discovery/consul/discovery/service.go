@@ -52,7 +52,7 @@ func (srv *Service) Proxy(serviceName, path string, rw http.ResponseWriter, req 
 				writer.WriteHeader(200)
 				json.NewEncoder(writer).Encode(map[string]interface{}{
 					"error_code":1005,
-					"message":fmt.Printf("服务访问错误:servername:%s,serveraddr:%s,err:%s",serviceName,addr,e.Error()),
+					"message":fmt.Sprintf("服务访问错误:servername:%s,serveraddr:%s,err:%s",serviceName,addr,e.Error()),
 				})
 			}
 			proxy.ServeHTTP(rw,req)
