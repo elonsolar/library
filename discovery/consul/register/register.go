@@ -25,7 +25,7 @@ func Register(engine *gin.Engine) {
 	}
 	register.register()
 	register.check()
-	//register.consuleClient.Agent().Services()
+	register.consuleClient.Agent().ServiceRegister(register.registration)
 	engine.GET("/check", func(ctx *gin.Context) {
 		ctx.JSON(200, map[string]string{"status": "ok"})
 	})
@@ -52,4 +52,5 @@ func (r *register) check() {
 	r.agentServiceCheck.Interval = "5s"
 	//注册check服务。
 	r.registration.Check = r.agentServiceCheck
+
 }
