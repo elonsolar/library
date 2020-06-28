@@ -14,28 +14,26 @@ import (
 type register struct {
 	registration      *consulapi.AgentServiceRegistration
 	agentServiceCheck *consulapi.AgentServiceCheck
-	consuleClient *consulapi.Client
+	consuleClient     *consulapi.Client
 }
 
 func Register(engine *gin.Engine) {
 	register := &register{
 		registration:      new(consulapi.AgentServiceRegistration),
 		agentServiceCheck: new(consulapi.AgentServiceCheck),
-		consuleClient:config.GetConsulClient(),
+		consuleClient:     config.GetConsulClient(),
 	}
 	register.register()
 	register.check()
 	//register.consuleClient.Agent().Services()
-	go func() {
-		engine.GET("/check", func(ctx *gin.Context) {
-			ctx.JSON(200, map[string]string{"status": "ok"})
-		})
-		s := endless.NewServer(":"+strconv.Itoa(env.ServerPort), engine)
-		err := s.ListenAndServe()
-		if err != nil {
-			fmt.Println(err)
-		}
-	}()
+	engine.GET("/check", func(ctx *gin.Context) {
+		ctx.JSON(200, map[string]string{"status": "ok"})
+	})
+	s := endless.NewServer(":"+strconv.Itoa(env.ServerPort), engine)
+	err := s.ListenAndServe()
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 func (r *register) register() {
