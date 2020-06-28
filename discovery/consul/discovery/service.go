@@ -2,10 +2,10 @@ package discovery
 
 import (
 	"fmt"
+	"github.com/cxqlkk/go-library/discovery/consul/config"
+	"github.com/cxqlkk/go-library/encode"
+	"github.com/cxqlkk/go-library/log"
 	"github.com/hashicorp/consul/api"
-	"go-library/discovery/consul/config"
-	errors "go-library/encode"
-	"go-library/log"
 	"go.uber.org/zap"
 	"strconv"
 	"sync/atomic"
@@ -41,7 +41,7 @@ func (srv *Service) GetService(serviceName string) (addr string, err error) {
 	if addr, ok := services[serviceName]; ok {
 		return addr, nil
 	}
-	return "", errors.ServiceNotFound
+	return "", encode.ServiceNotFound
 }
 
 func (srv *Service) initService() (err error) {

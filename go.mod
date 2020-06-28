@@ -1,4 +1,4 @@
-module go-library
+module github.com/cxqlkk/go-library
 
 go 1.14
 

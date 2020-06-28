@@ -2,11 +2,11 @@ package register
 
 import (
 	"fmt"
+	"github.com/cxqlkk/go-library/discovery/consul/config"
+	"github.com/cxqlkk/go-library/discovery/consul/env"
 	"github.com/fvbock/endless"
 	"github.com/gin-gonic/gin"
 	consulapi "github.com/hashicorp/consul/api"
-	"go-library/discovery/consul/config"
-	"go-library/discovery/consul/env"
 	"strconv"
 	"time"
 )

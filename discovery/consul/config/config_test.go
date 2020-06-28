@@ -3,9 +3,10 @@ package config
 import (
 	"flag"
 	"fmt"
+	"github.com/cxqlkk/go-library/discovery/consul/env"
 	"github.com/fvbock/endless"
 	"github.com/gin-gonic/gin"
-	"go-library/discovery/consul/env"
+
 	"io/ioutil"
 	"testing"
 )
