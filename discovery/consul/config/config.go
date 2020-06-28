@@ -2,9 +2,10 @@ package config
 
 import (
 	"fmt"
+	"github.com/BurntSushi/toml"
 	consulapi "github.com/hashicorp/consul/api"
 	"go-library/discovery/consul/env"
-	encode "go-library/encode"
+	"go-library/encode"
 	"go-library/log"
 	"go.uber.org/zap"
 	"os"
@@ -29,16 +30,31 @@ type Config struct {
 	lastIndex uint64
 }
 
-func RemoteConfig(conf interface{}) *Config {
+func InitConfig(conf interface{}) error {
+	if env.Conf == "" {
+		return RemoteConfig(conf)
+	}
+	return LocalConfig(conf)
+}
+
+func LocalConfig(conf interface{}) error {
+	if _, err := toml.DecodeFile(env.Conf+"/application.toml", conf);err!=nil {
+		log.Logger.Error("初始化配置失败", zap.Error(err))
+	}
+	return nil
+}
+
+func RemoteConfig(conf interface{}) error {
 	config := &Config{
 		consuleClient: GetConsulClient(),
 		conf:          conf,
 	}
-	if err:=config.init();err!=nil{
-		panic(fmt.Errorf("%s","初始化配置失败"))
+	if err := config.init(); err != nil {
+		log.Logger.Error("初始化配置失败", zap.Error(err))
+		return fmt.Errorf("%w", err)
 	}
 	go config.checkConfig()
-	return config
+	return nil
 }
 
 func GetConsulClient() *consulapi.Client {
@@ -62,7 +78,7 @@ func (conf *Config) checkConfig() {
 				//if err:=conf.load(kvs);err!=nil{
 				//	log.Logger.Error("conf.checkConfig()->conf.load()", zap.Error(err))
 				//}
-				syscall.Kill(os.Getpid(),syscall.SIGHUP)
+				syscall.Kill(os.Getpid(), syscall.SIGHUP)
 			}
 		}
 	}
@@ -74,7 +90,7 @@ func (conf *Config) init() (err error) {
 	for i := 0; i < _configInitRetryTime; i++ {
 
 		if kvs, meta, err = conf.consuleClient.KV().List(env.KVPrefix, nil); err == nil {
-			conf.lastIndex=meta.LastIndex
+			conf.lastIndex = meta.LastIndex
 			return conf.load(kvs)
 		}
 		log.Logger.Error("conf.init() error", zap.Error(encode.InterfaceError))
@@ -82,7 +98,6 @@ func (conf *Config) init() (err error) {
 	}
 	return
 }
-
 
 func (conf *Config) load(kvpairs consulapi.KVPairs) error {
 	mp := map[string]string{}

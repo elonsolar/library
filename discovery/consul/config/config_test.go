@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/fvbock/endless"
 	"github.com/gin-gonic/gin"
+	"go-library/discovery/consul/env"
 	"io/ioutil"
 	"testing"
 )
@@ -29,6 +30,15 @@ func TestConfig(t *testing.T) {
 
 	select {}
 
+}
+func TestLocal(t *testing.T){
+	flag.Parse()
+	env.Conf="/Users/chenxiangqian/mn/projects/go-library/discovery/consul/config"
+	var c Conf
+	if err:=LocalConfig(&c);err!=nil{
+		panic(err)
+	}
+	fmt.Println(c)
 }
 
 func TestGin(t *testing.T) {
