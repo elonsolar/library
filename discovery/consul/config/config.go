@@ -29,7 +29,7 @@ type Config struct {
 	lastIndex uint64
 }
 
-func InitConfig(conf interface{}) *Config {
+func RemoteConfig(conf interface{}) *Config {
 	config := &Config{
 		consuleClient: GetConsulClient(),
 		conf:          conf,

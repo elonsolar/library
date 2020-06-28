@@ -24,7 +24,7 @@ func TestConfig(t *testing.T) {
 
 	flag.Parse()
 	var c = Conf{}
-	InitConfig(&c)
+	RemoteConfig(&c)
 	fmt.Println(c)
 
 	select {}
@@ -34,7 +34,7 @@ func TestConfig(t *testing.T) {
 func TestGin(t *testing.T) {
 	flag.Parse()
 	var c = Conf{}
-	InitConfig(&c)
+	RemoteConfig(&c)
 	fmt.Println("开始：：：", c.Db.User)
 	r := gin.New()
 	r.POST("/xx", func(c *gin.Context) {
