@@ -40,6 +40,7 @@ func InitConfig(conf interface{}) error {
 func LocalConfig(conf interface{}) error {
 	if _, err := toml.DecodeFile(env.Conf+"/application.toml", conf);err!=nil {
 		log.Logger.Error("初始化配置失败", zap.Error(err))
+		return err
 	}
 	return nil
 }
