@@ -19,5 +19,5 @@ func TestSerivce(t *testing.T){
 		c.String(200, "x")
 	})
 	s := endless.NewServer(":8128", r)
-	err := s.ListenAndServe()
+	 s.ListenAndServe()
 }

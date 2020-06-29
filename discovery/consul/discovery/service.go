@@ -23,7 +23,10 @@ const (
 type Service struct {
 	value        atomic.Value
 	consulClient *api.Client
-	lastIndex    uint64
+	//lastIndex    uint64
+
+	//监测服务
+	lastHealthIndex uint64
 }
 
 func NewService() *Service {
@@ -62,17 +65,14 @@ func (srv *Service) Proxy(serviceName, path string, rw http.ResponseWriter, req 
 	log.Logger.Error("srv.Proxy()", zap.Error(fmt.Errorf("%s", "服务不存在")))
 	return fmt.Errorf("%s", "服务不存在")
 }
-func (srv *Service) proxy(addr, path string, rw http.ResponseWriter, req *http.Request) error {
 
-	return nil
-}
 
 func (srv *Service) initService() (err error) {
 	var services = map[string][]string{}
-	var meta *api.QueryMeta
+	//var meta *api.QueryMeta
 	for i := 0; i < _serviceInitRetryTime; i++ {
-		if services, meta, err = srv.consulClient.Catalog().Services(nil); err == nil {
-			srv.lastIndex = meta.LastIndex
+		if services, _, err = srv.consulClient.Catalog().Services(nil); err == nil {
+			//srv.lastIndex = meta.LastIndex
 			return srv.loadServices(services)
 		}
 		log.Logger.Error("srv.initService()", zap.Error(err))
@@ -99,12 +99,17 @@ func (srv *Service) serviceCheck() {
 	for {
 		select {
 		case <-configTimer.C:
-			if services, meta, err := srv.consulClient.Catalog().Services(nil); err != nil {
+			if _,healthMeta,err:=srv.consulClient.Health().State(api.HealthPassing,nil);err!=nil{
 				log.Logger.Error("srv.serviceCheck()", zap.Error(err))
-			} else if meta.LastIndex != srv.lastIndex {
-				srv.loadServices(services)
-				srv.lastIndex=meta.LastIndex
+			}else if healthMeta.LastIndex!=srv.lastHealthIndex{
+				if services, _, err := srv.consulClient.Catalog().Services(nil); err != nil {
+					log.Logger.Error("srv.serviceCheck()", zap.Error(err))
+				} else {
+					srv.loadServices(services)
+				}
+				srv.lastHealthIndex=healthMeta.LastIndex
 			}
+
 		}
 	}
 
