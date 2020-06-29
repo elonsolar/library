@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 	consulapi "github.com/hashicorp/consul/api"
 	"strconv"
-	"time"
 )
 
 type register struct {
@@ -37,7 +36,7 @@ func Register(engine *gin.Engine) {
 }
 
 func (r *register) register() {
-	r.registration.ID = env.ServerName + time.Now().Format("150405")
+	//r.registration.ID = env.ServerName + time.Now().Format("150405")
 	r.registration.Name = env.ServerName
 	r.registration.Port = env.ServerPort
 	//registration.Tags = []string{"tags"}
