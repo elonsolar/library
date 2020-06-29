@@ -41,7 +41,7 @@ func NewService() *Service {
 	return srv
 }
 
-func (srv *Service) Proxy(serviceName, path string, rw http.ResponseWriter, req *http.Request) error {
+func (srv *Service) Call(serviceName, path string, rw http.ResponseWriter, req *http.Request) error {
 	services := srv.value.Load().(map[string]string)
 	if addr, ok := services[serviceName]; ok {
 		if remote, err := url.Parse(addr); err != nil {
