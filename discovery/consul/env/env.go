@@ -16,15 +16,12 @@ var (
 	LocalAddr  string
 	ServerPort int
 	ServerName string
+	ServerId   string
 
 	//discovery
 
-
-
 	//配置 路径
 	Conf string
-
-
 )
 
 func init() {
@@ -37,10 +34,10 @@ func init() {
 	flag.StringVar(&LocalAddr, "localaddr", "127.0.0.1", "本地服务地址")
 	flag.IntVar(&ServerPort, "serverport", 9050, "本地服务地址")
 	flag.StringVar(&ServerName, "servername", "hello", "服务名称")
+	flag.StringVar(&ServerId, "serverid", "hello1", "服务名称")
 	//配置
 	flag.StringVar(&Conf, "conf", "", "配置路径")
 
 	//discovery
-
 
 }
