@@ -84,6 +84,7 @@ func (conf *Config) checkConfig() {
 	//	}
 	//}
 	for {
+		log.Logger.Info("开始检查配置更新", zap.String("now", time.Now().Format("2006-01-02 15:04:05")))
 		if _, meta, err := conf.consuleClient.KV().List(env.KVPrefix, &consulapi.QueryOptions{
 			WaitIndex: conf.lastIndex,
 			WaitTime:  time.Second * 100,
@@ -92,6 +93,8 @@ func (conf *Config) checkConfig() {
 		} else if conf.lastIndex != meta.LastIndex {
 			syscall.Kill(os.Getpid(), syscall.SIGHUP)
 		}
+		log.Logger.Info("配置检查结束，无更新", zap.String("now", time.Now().Format("2006-01-02 15:04:05")))
+		time.Sleep(_configCheckInterval)
 	}
 }
 
