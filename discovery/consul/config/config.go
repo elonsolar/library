@@ -83,6 +83,7 @@ func (conf *Config) checkConfig() {
 	//		}
 	//	}
 	//}
+	time.Sleep(time.Second * 10)
 	for {
 		log.Logger.Info("开始检查配置更新", zap.String("now", time.Now().Format("2006-01-02 15:04:05")))
 		if _, meta, err := conf.consuleClient.KV().List(env.KVPrefix, &consulapi.QueryOptions{

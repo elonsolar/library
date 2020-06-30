@@ -118,25 +118,25 @@ func (srv *Service) serviceCheck() {
 	//
 	//	}
 	//}
-	 for{
-	 	log.Logger.Info("开始检查服务更新",zap.String("now",time.Now().Format("2006-01-02 15:04:05")))
-		 if _, healthMeta, err := srv.consulClient.Health().State(api.HealthPassing, &api.QueryOptions{
-			 WaitIndex: srv.lastHealthIndex,
-			 WaitTime:  100 * time.Second,
-		 }); err != nil {
-			 log.Logger.Error("srv.serviceCheck()", zap.Error(err))
-		 } else if healthMeta.LastIndex != srv.lastHealthIndex {
-			 log.Logger.Info("配置检查结束，存在更新", zap.String("now", time.Now().Format("2006-01-02 15:04:05")),zap.Int("srv.lastHealthIndex",int(srv.lastHealthIndex)),zap.Int("healthMeta.LastInde",int(healthMeta.LastIndex)))
-			 if services, _, err := srv.consulClient.Catalog().Services(nil); err != nil {
-				 log.Logger.Error("srv.serviceCheck()", zap.Error(err))
-			 } else {
-				 srv.loadServices(services)
-			 }
-			 srv.lastHealthIndex = healthMeta.LastIndex
-		 }
-		 log.Logger.Info("服务检查完毕",zap.String("now",time.Now().Format("2006-01-02 15:04:05")))
-		 time.Sleep(_serviceCheckInterval) //避免出现 意外情况，还是先睡一会
-	 }
+	for {
+		log.Logger.Info("开始检查服务更新", zap.String("now", time.Now().Format("2006-01-02 15:04:05")))
+		if _, healthMeta, err := srv.consulClient.Health().State(api.HealthPassing, &api.QueryOptions{
+			WaitIndex: srv.lastHealthIndex,
+			WaitTime:  100 * time.Second,
+		}); err != nil {
+			log.Logger.Error("srv.serviceCheck()", zap.Error(err))
+		} else if healthMeta.LastIndex != srv.lastHealthIndex {
+			log.Logger.Info("服务检查存在更新", zap.String("now", time.Now().Format("2006-01-02 15:04:05")), zap.Int("srv.lastHealthIndex", int(srv.lastHealthIndex)), zap.Int("healthMeta.LastInde", int(healthMeta.LastIndex)))
+			if services, _, err := srv.consulClient.Catalog().Services(nil); err != nil {
+				log.Logger.Error("srv.serviceCheck()", zap.Error(err))
+			} else {
+				srv.loadServices(services)
+			}
+			srv.lastHealthIndex = healthMeta.LastIndex
+		}
+		log.Logger.Info("服务检查完毕", zap.String("now", time.Now().Format("2006-01-02 15:04:05")))
+		time.Sleep(_serviceCheckInterval) //避免出现 意外情况，还是先睡一会
+	}
 }
 
 //随机
