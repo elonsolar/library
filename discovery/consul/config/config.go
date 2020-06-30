@@ -91,6 +91,7 @@ func (conf *Config) checkConfig() {
 		}); err != nil {
 			log.Logger.Error("conf.checkConfig()", zap.Error(err))
 		} else if conf.lastIndex != meta.LastIndex {
+			log.Logger.Info("配置检查结束，存在更新", zap.String("now", time.Now().Format("2006-01-02 15:04:05")),zap.Int("conf.lastindex",int(conf.lastIndex)),zap.Int("meta.lastindex",int(meta.LastIndex)))
 			syscall.Kill(os.Getpid(), syscall.SIGHUP)
 		}
 		log.Logger.Info("配置检查结束，无更新", zap.String("now", time.Now().Format("2006-01-02 15:04:05")))

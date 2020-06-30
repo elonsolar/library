@@ -126,6 +126,7 @@ func (srv *Service) serviceCheck() {
 		 }); err != nil {
 			 log.Logger.Error("srv.serviceCheck()", zap.Error(err))
 		 } else if healthMeta.LastIndex != srv.lastHealthIndex {
+			 log.Logger.Info("配置检查结束，存在更新", zap.String("now", time.Now().Format("2006-01-02 15:04:05")),zap.Int("srv.lastHealthIndex",int(srv.lastHealthIndex)),zap.Int("healthMeta.LastInde",int(healthMeta.LastIndex)))
 			 if services, _, err := srv.consulClient.Catalog().Services(nil); err != nil {
 				 log.Logger.Error("srv.serviceCheck()", zap.Error(err))
 			 } else {
