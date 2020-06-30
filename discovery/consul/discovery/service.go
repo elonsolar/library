@@ -43,9 +43,9 @@ func NewService() *Service {
 }
 
 func (srv *Service) Call(serviceName, path string, rw http.ResponseWriter, req *http.Request) error {
-	 services := srv.value.Load().(map[string][]string)
+	services := srv.value.Load().(map[string][]string)
 	if addrs, ok := services[serviceName]; ok {
-		var addr= Random(addrs)
+		var addr = Random(addrs)
 		if remote, err := url.Parse(addr); err != nil {
 			log.Logger.Error("srv.Proxy() 服务地址解析失败:", zap.Error(fmt.Errorf("serverName:%s addr:%s %w", serviceName, addr, err)))
 			return err
@@ -98,29 +98,46 @@ func (srv *Service) loadServices(serves map[string][]string) (err error) {
 }
 
 func (srv *Service) serviceCheck() {
-	configTimer := time.NewTicker(_serviceCheckInterval)
-	for {
-		select {
-		case <-configTimer.C:
-			if _, healthMeta, err := srv.consulClient.Health().State(api.HealthPassing, nil); err != nil {
-				log.Logger.Error("srv.serviceCheck()", zap.Error(err))
-			} else if healthMeta.LastIndex != srv.lastHealthIndex {
-				if services, _, err := srv.consulClient.Catalog().Services(nil); err != nil {
-					log.Logger.Error("srv.serviceCheck()", zap.Error(err))
-				} else {
-					srv.loadServices(services)
-				}
-				srv.lastHealthIndex = healthMeta.LastIndex
-			}
-
-		}
-	}
-
+	//configTimer := time.NewTicker(_serviceCheckInterval)
+	//for {
+	//	select {
+	//	case <-configTimer.C:
+	//		if _, healthMeta, err := srv.consulClient.Health().State(api.HealthPassing, &api.QueryOptions{
+	//			WaitIndex: srv.lastHealthIndex,
+	//			WaitTime:  100 * time.Second,
+	//		}); err != nil {
+	//			log.Logger.Error("srv.serviceCheck()", zap.Error(err))
+	//		} else if healthMeta.LastIndex != srv.lastHealthIndex {
+	//			if services, _, err := srv.consulClient.Catalog().Services(nil); err != nil {
+	//				log.Logger.Error("srv.serviceCheck()", zap.Error(err))
+	//			} else {
+	//				srv.loadServices(services)
+	//			}
+	//			srv.lastHealthIndex = healthMeta.LastIndex
+	//		}
+	//
+	//	}
+	//}
+	 for{
+		 if _, healthMeta, err := srv.consulClient.Health().State(api.HealthPassing, &api.QueryOptions{
+			 WaitIndex: srv.lastHealthIndex,
+			 WaitTime:  100 * time.Second,
+		 }); err != nil {
+			 log.Logger.Error("srv.serviceCheck()", zap.Error(err))
+		 } else if healthMeta.LastIndex != srv.lastHealthIndex {
+			 if services, _, err := srv.consulClient.Catalog().Services(nil); err != nil {
+				 log.Logger.Error("srv.serviceCheck()", zap.Error(err))
+			 } else {
+				 srv.loadServices(services)
+			 }
+			 srv.lastHealthIndex = healthMeta.LastIndex
+		 }
+	 }
 }
 
 //随机
-func Random(addrs []string)string{
-	if len(addrs)==0{
+func Random(addrs []string) string {
+	if len(addrs) == 0 {
 		return ""
 	}
 	return addrs[rand.Intn(len(addrs))]

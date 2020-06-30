@@ -38,7 +38,7 @@ func InitConfig(conf interface{}) error {
 }
 
 func LocalConfig(conf interface{}) error {
-	if _, err := toml.DecodeFile(env.Conf+"/application.toml", conf);err!=nil {
+	if _, err := toml.DecodeFile(env.Conf+"/application.toml", conf); err != nil {
 		log.Logger.Error("初始化配置失败", zap.Error(err))
 		return err
 	}
@@ -69,18 +69,28 @@ func GetConsulClient() *consulapi.Client {
 }
 
 func (conf *Config) checkConfig() {
-	configTimer := time.NewTicker(_configCheckInterval)
+	//configTimer := time.NewTicker(_configCheckInterval)
+	//for {
+	//	select {
+	//	case <-configTimer.C:
+	//		if _, meta, err := conf.consuleClient.KV().List(env.KVPrefix, &consulapi.QueryOptions{
+	//			WaitIndex:         conf.lastIndex,
+	//			WaitTime:          time.Second*100,
+	//		}); err != nil {
+	//			log.Logger.Error("conf.checkConfig()", zap.Error(err))
+	//		} else if conf.lastIndex != meta.LastIndex {
+	//			syscall.Kill(os.Getpid(), syscall.SIGHUP)
+	//		}
+	//	}
+	//}
 	for {
-		select {
-		case <-configTimer.C:
-			if _, meta, err := conf.consuleClient.KV().List(env.KVPrefix, nil); err != nil {
-				log.Logger.Error("conf.checkConfig()", zap.Error(err))
-			} else if conf.lastIndex != meta.LastIndex {
-				//if err:=conf.load(kvs);err!=nil{
-				//	log.Logger.Error("conf.checkConfig()->conf.load()", zap.Error(err))
-				//}
-				syscall.Kill(os.Getpid(), syscall.SIGHUP)
-			}
+		if _, meta, err := conf.consuleClient.KV().List(env.KVPrefix, &consulapi.QueryOptions{
+			WaitIndex: conf.lastIndex,
+			WaitTime:  time.Second * 100,
+		}); err != nil {
+			log.Logger.Error("conf.checkConfig()", zap.Error(err))
+		} else if conf.lastIndex != meta.LastIndex {
+			syscall.Kill(os.Getpid(), syscall.SIGHUP)
 		}
 	}
 }
