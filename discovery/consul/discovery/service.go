@@ -7,6 +7,7 @@ import (
 	"github.com/cxqlkk/library/log"
 	"github.com/hashicorp/consul/api"
 	"go.uber.org/zap"
+	"math/rand"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -42,8 +43,9 @@ func NewService() *Service {
 }
 
 func (srv *Service) Call(serviceName, path string, rw http.ResponseWriter, req *http.Request) error {
-	services := srv.value.Load().(map[string]string)
-	if addr, ok := services[serviceName]; ok {
+	 services := srv.value.Load().(map[string][]string)
+	if addrs, ok := services[serviceName]; ok {
+		var addr= Random(addrs)
 		if remote, err := url.Parse(addr); err != nil {
 			log.Logger.Error("srv.Proxy() 服务地址解析失败:", zap.Error(fmt.Errorf("serverName:%s addr:%s %w", serviceName, addr, err)))
 			return err
@@ -51,21 +53,20 @@ func (srv *Service) Call(serviceName, path string, rw http.ResponseWriter, req *
 			req.URL.Path = path
 			proxy := NewSingleHostReverseProxy(remote)
 			proxy.ErrorHandler = func(writer http.ResponseWriter, request *http.Request, e error) {
-				log.Logger.Error("srv.Proxy()",zap.Error(err))
+				log.Logger.Error("srv.Proxy()", zap.Error(err))
 				writer.WriteHeader(200)
 				json.NewEncoder(writer).Encode(map[string]interface{}{
-					"error_code":1005,
-					"message":fmt.Sprintf("服务访问错误:servername:%s,serveraddr:%s,err:%s",serviceName,addr,e.Error()),
+					"error_code": 1005,
+					"message":    fmt.Sprintf("服务访问错误:servername:%s,serveraddr:%s,err:%s", serviceName, addr, e.Error()),
 				})
 			}
-			proxy.ServeHTTP(rw,req)
+			proxy.ServeHTTP(rw, req)
 			return nil
 		}
 	}
 	log.Logger.Error("srv.Proxy()", zap.Error(fmt.Errorf("%s", "服务不存在")))
 	return fmt.Errorf("%s", "服务不存在")
 }
-
 
 func (srv *Service) initService() (err error) {
 	var services = map[string][]string{}
@@ -80,14 +81,16 @@ func (srv *Service) initService() (err error) {
 	return err
 }
 func (srv *Service) loadServices(serves map[string][]string) (err error) {
-	var serviceMap = map[string]string{}
+	var serviceMap = map[string][]string{}
 	for k, _ := range serves {
 		if entry, _, err := srv.consulClient.Health().Service(k, "", true, nil); err != nil {
 			log.Logger.Error("srv.loadServices()", zap.Error(err))
 			return err
-		} else if len(entry) > 0 {
+		} else {
 			//todo fixme
-			serviceMap[k] = "http://"+entry[0].Service.Address + ":" + strconv.Itoa(entry[0].Service.Port)
+			for _, ele := range entry {
+				serviceMap[k] = append(serviceMap[k], "http://"+ele.Service.Address+":"+strconv.Itoa(ele.Service.Port))
+			}
 		}
 	}
 	srv.value.Store(serviceMap)
@@ -99,18 +102,26 @@ func (srv *Service) serviceCheck() {
 	for {
 		select {
 		case <-configTimer.C:
-			if _,healthMeta,err:=srv.consulClient.Health().State(api.HealthPassing,nil);err!=nil{
+			if _, healthMeta, err := srv.consulClient.Health().State(api.HealthPassing, nil); err != nil {
 				log.Logger.Error("srv.serviceCheck()", zap.Error(err))
-			}else if healthMeta.LastIndex!=srv.lastHealthIndex{
+			} else if healthMeta.LastIndex != srv.lastHealthIndex {
 				if services, _, err := srv.consulClient.Catalog().Services(nil); err != nil {
 					log.Logger.Error("srv.serviceCheck()", zap.Error(err))
 				} else {
 					srv.loadServices(services)
 				}
-				srv.lastHealthIndex=healthMeta.LastIndex
+				srv.lastHealthIndex = healthMeta.LastIndex
 			}
 
 		}
 	}
 
+}
+
+//随机
+func Random(addrs []string)string{
+	if len(addrs)==0{
+		return ""
+	}
+	return addrs[rand.Intn(len(addrs))]
 }
