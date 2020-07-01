@@ -27,12 +27,12 @@ var (
 func init() {
 
 	//config
-	flag.StringVar(&ConsulAddr, "consuladdr", "dev.codenai.com:8500", "consul 注册地址")
+	flag.StringVar(&ConsulAddr, "consuladdr", "localhost:8500", "consul 注册地址")
 	flag.StringVar(&KVPrefix, "kvprefix", "foo", "配置首项")
 
 	//register
 	flag.StringVar(&LocalAddr, "localaddr", "127.0.0.1", "本地服务地址")
-	flag.IntVar(&ServerPort, "serverport", 9050, "本地服务地址")
+	flag.IntVar(&ServerPort, "serverport", 9050, "本地服务端口")
 	flag.StringVar(&ServerName, "servername", "hello", "服务名称")
 	flag.StringVar(&ServerId, "serverid", "hello1", "服务名称")
 	//配置
