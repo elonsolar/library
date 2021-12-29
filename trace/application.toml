@@ -1,0 +1,9 @@
+[ResourceConfig]
+    ServiceName = "trace_test"
+	ServiceVersion = "1.0"
+[ExportConfig]
+	Name ="stdout"
+	[ExportConfig.Attribute]
+        FileName = "trace.txt"
+        PrettyPrint = true
+        Timestamps = true

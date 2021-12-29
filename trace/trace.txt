@@ -1,0 +1,45 @@
+{
+	"Name": "DoFunc",
+	"SpanContext": {
+		"TraceID": "9e1bbc75a259ce187d7c6754458b889b",
+		"SpanID": "d08ef1b102b61b6a",
+		"TraceFlags": "01",
+		"TraceState": "",
+		"Remote": false
+	},
+	"Parent": {
+		"TraceID": "9e1bbc75a259ce187d7c6754458b889b",
+		"SpanID": "0fd880edafab7611",
+		"TraceFlags": "01",
+		"TraceState": "",
+		"Remote": false
+	},
+	"SpanKind": 1,
+	"StartTime": "2021-12-24T14:59:22.063238+08:00",
+	"EndTime": "2021-12-24T14:59:22.063247348+08:00",
+	"Attributes": [
+		{
+			"Key": "a_key",
+			"Value": {
+				"Type": "STRING",
+				"Value": "a_value"
+			}
+		}
+	],
+	"Events": null,
+	"Links": null,
+	"Status": {
+		"Code": "Unset",
+		"Description": ""
+	},
+	"DroppedAttributes": 0,
+	"DroppedEvents": 0,
+	"DroppedLinks": 0,
+	"ChildSpanCount": 0,
+	"Resource": null,
+	"InstrumentationLibrary": {
+		"Name": "xx",
+		"Version": "",
+		"SchemaURL": ""
+	}
+}
