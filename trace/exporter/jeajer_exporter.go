@@ -6,17 +6,18 @@ import (
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
 
-func newJeajerExporter(attr config.ExportAttribute) (sdktrace.SpanExporter, error) {
+// https://github.com/open-telemetry/opentelemetry-go/tree/main/exporters/jaeger
+func newJeajerExporter(attr config.ExportAttribute) (func() error, sdktrace.SpanExporter, error) {
 
 	var cfg = &config.JeagerExporterConfig{}
 
 	if err := attr.Decode(cfg); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	exp, err := jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(cfg.Url)))
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return exp, nil
+	return func() error { return nil }, exp, nil
 }

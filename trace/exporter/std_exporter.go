@@ -1,7 +1,6 @@
 package exporter
 
 import (
-	"io"
 	"os"
 
 	"github.com/elonsolar/library/trace/config"
@@ -10,24 +9,24 @@ import (
 )
 
 // stdoutExporter
-func newStdExporter(attr config.ExportAttribute) (sdktrace.SpanExporter, error) {
+func newStdExporter(attr config.ExportAttribute) (func() error, sdktrace.SpanExporter, error) {
 
 	var cfg = &config.StdoutExporterConfig{}
 	if err := attr.Decode(cfg); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	var (
-		writer io.Writer
+		writer *os.File
 		err    error
 	)
 	if cfg.FileName == "" {
 		writer = os.Stdout
 	} else {
-		writer, err = os.Create(cfg.FileName)
-		// writer, err = os.OpenFile(cfg.FileName, os.O_CREATE|os.O_RDWR, 0666)
+		// writer, err = os.Create(cfg.FileName)
+		writer, err = os.OpenFile(cfg.FileName, os.O_CREATE|os.O_RDWR, 0666)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 	}
 	var options = []stdouttrace.Option{stdouttrace.WithWriter(writer)}
@@ -40,5 +39,11 @@ func newStdExporter(attr config.ExportAttribute) (sdktrace.SpanExporter, error) 
 		options = append(options, stdouttrace.WithoutTimestamps())
 	}
 
-	return stdouttrace.New(options...)
+	export, err := stdouttrace.New(options...)
+	if err != nil {
+		return nil, nil, err
+	}
+	return func() error {
+		return writer.Close()
+	}, export, nil
 }

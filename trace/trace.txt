@@ -1,22 +1,22 @@
 {
 	"Name": "DoFunc",
 	"SpanContext": {
-		"TraceID": "9e1bbc75a259ce187d7c6754458b889b",
-		"SpanID": "d08ef1b102b61b6a",
+		"TraceID": "312c385e7858c1f9ab8611abe1933bbb",
+		"SpanID": "2e02109cb8e01890",
 		"TraceFlags": "01",
 		"TraceState": "",
 		"Remote": false
 	},
 	"Parent": {
-		"TraceID": "9e1bbc75a259ce187d7c6754458b889b",
-		"SpanID": "0fd880edafab7611",
+		"TraceID": "312c385e7858c1f9ab8611abe1933bbb",
+		"SpanID": "9365196c5edf898b",
 		"TraceFlags": "01",
 		"TraceState": "",
 		"Remote": false
 	},
 	"SpanKind": 1,
-	"StartTime": "2021-12-24T14:59:22.063238+08:00",
-	"EndTime": "2021-12-24T14:59:22.063247348+08:00",
+	"StartTime": "2022-01-06T16:18:31.944153+08:00",
+	"EndTime": "2022-01-06T16:18:31.944155162+08:00",
 	"Attributes": [
 		{
 			"Key": "a_key",
@@ -36,6 +36,43 @@
 	"DroppedEvents": 0,
 	"DroppedLinks": 0,
 	"ChildSpanCount": 0,
+	"Resource": null,
+	"InstrumentationLibrary": {
+		"Name": "xx",
+		"Version": "",
+		"SchemaURL": ""
+	}
+}
+{
+	"Name": "begin",
+	"SpanContext": {
+		"TraceID": "312c385e7858c1f9ab8611abe1933bbb",
+		"SpanID": "9365196c5edf898b",
+		"TraceFlags": "01",
+		"TraceState": "",
+		"Remote": false
+	},
+	"Parent": {
+		"TraceID": "00000000000000000000000000000000",
+		"SpanID": "0000000000000000",
+		"TraceFlags": "00",
+		"TraceState": "",
+		"Remote": false
+	},
+	"SpanKind": 1,
+	"StartTime": "2022-01-06T16:18:31.944131+08:00",
+	"EndTime": "2022-01-06T16:18:31.944162339+08:00",
+	"Attributes": null,
+	"Events": null,
+	"Links": null,
+	"Status": {
+		"Code": "Unset",
+		"Description": ""
+	},
+	"DroppedAttributes": 0,
+	"DroppedEvents": 0,
+	"DroppedLinks": 0,
+	"ChildSpanCount": 1,
 	"Resource": null,
 	"InstrumentationLibrary": {
 		"Name": "xx",

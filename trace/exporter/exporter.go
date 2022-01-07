@@ -13,7 +13,7 @@ var (
 )
 
 // 我们从配置文件 构建对象，
-func NewExporter(cfg *config.ExportConfig) (sdktrace.SpanExporter, error) {
+func NewExporter(cfg *config.ExportConfig) (func() error, sdktrace.SpanExporter, error) {
 
 	switch cfg.Name {
 	case constant.STDOUT:
@@ -21,6 +21,6 @@ func NewExporter(cfg *config.ExportConfig) (sdktrace.SpanExporter, error) {
 	case constant.JEAJER:
 		return newJeajerExporter(cfg.Attribute)
 	default:
-		return nil, ErrNoExportSpecified
+		return func() error { return nil }, nil, ErrNoExportSpecified
 	}
 }

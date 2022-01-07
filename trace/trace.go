@@ -10,11 +10,11 @@ import (
 )
 
 // register a trace which configed by user  to otel
-func RegisterTrace(cfg *config.Config) error {
+func RegisterTrace(cfg *config.Config) (func() error, error) {
 
-	exp, err := exporter.NewExporter(cfg.ExportConfig)
+	release, exp, err := exporter.NewExporter(cfg.ExportConfig)
 	if err != nil {
-		return fmt.Errorf("trace init exporter err:%w", err)
+		return release, fmt.Errorf("trace init exporter err:%w  ", err)
 	}
 
 	tp := sdktrace.NewTracerProvider(
@@ -22,5 +22,5 @@ func RegisterTrace(cfg *config.Config) error {
 		sdktrace.WithResource(newResource(cfg.ResourceConfig)),
 	)
 	otel.SetTracerProvider(tp)
-	return nil
+	return release, nil
 }
