@@ -8,18 +8,23 @@ import (
 	oteltrace "go.opentelemetry.io/otel/trace"
 )
 
-func WithTrace() gin.HandlerFunc {
+func WithTrace(serverName string) gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 		opts := []oteltrace.SpanStartOption{
 			oteltrace.WithAttributes(semconv.NetAttributesFromHTTPRequest("tcp", c.Request)...),
 			oteltrace.WithAttributes(semconv.EndUserAttributesFromHTTPRequest(c.Request)...),
-			// oteltrace.WithAttributes(semconv.HTTPServerAttributesFromHTTPRequest(service, c.FullPath(), c.Request)...),
+			oteltrace.WithAttributes(semconv.HTTPServerAttributesFromHTTPRequest(serverName, c.FullPath(), c.Request)...),
 			oteltrace.WithSpanKind(oteltrace.SpanKindServer),
 		}
-		_, span := otel.Tracer("gin").Start(c, "gin_start", opts)
+		newCtx, span := otel.Tracer("gin").Start(c, "gin_start", opts...)
 
 		defer span.End()
+
+		c.Request = c.Request.WithContext(newCtx)
+		defer func() {
+			c.Request = c.Request.WithContext(c)
+		}()
 		c.Next()
 		status := c.Writer.Status()
 		attrs := semconv.HTTPAttributesFromHTTPStatusCode(status)

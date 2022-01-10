@@ -4,12 +4,12 @@ import (
 	"context"
 	"fmt"
 	"testing"
-	"time"
 
 	"github.com/BurntSushi/toml"
 	"github.com/elonsolar/library/trace/config"
 	"github.com/elonsolar/library/trace/plugin/gintrace"
 	"github.com/elonsolar/library/trace/plugin/gormtrace"
+
 	"github.com/gin-gonic/gin"
 	"go.opentelemetry.io/otel"
 	"gorm.io/driver/mysql"
@@ -55,18 +55,39 @@ func TestTrace(t *testing.T) {
 	}
 	eg := gin.New()
 
-	eg.Use(gintrace.WithTrace())
-	// eg.Use(gin)go
-	eg.Run(":9090")
-	ctx, span := otel.Tracer("xx").Start(context.Background(), "begin")
-	// defer span.End()
-	// for i := 0; i < 100; i++ {
+	eg.Use(gintrace.WithTrace("demo"))
 
-	DoFunc(ctx)
+	// var routers = []router{router{
+	// 	Method: http.MethodGet,
+	// 	Url:    "/demo",
+	// 	handler: func(c *gin.Context) interface{} {
+
+	// 		return map[string]interface{}{
+	// 			"data": "ok",
+	// 		}
+	// 	},
+	// },
 	// }
-	span.End()
+	// var wrap = func(rts []router) gin.HandlerFunc {
 
-	time.Sleep(time.Second * 20)
+	// }
+
+	// eg.Use(gin)go
+	eg.GET("/test", func(c *gin.Context) {
+
+		DoFunc(c.Request.Context())
+		c.JSON(200, map[string]interface{}{
+			"": 1,
+		})
+	})
+	eg.Run(":9090")
+
+}
+
+type router struct {
+	Method  string
+	Url     string
+	handler func(c *gin.Context) interface{}
 }
 
 func DoFunc(ctx context.Context) {
