@@ -1,4 +1,4 @@
-package gin_trace
+package gintrace
 
 import (
 	"github.com/gin-gonic/gin"

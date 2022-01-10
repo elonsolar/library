@@ -1,4 +1,4 @@
-package gorm_trace
+package gormtrace
 
 import (
 	"go.opentelemetry.io/otel"

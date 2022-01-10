@@ -8,7 +8,8 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/elonsolar/library/trace/config"
-	gt "github.com/elonsolar/library/trace/plugin/gorm_trace"
+	"github.com/elonsolar/library/trace/plugin/gintrace"
+	"github.com/elonsolar/library/trace/plugin/gormtrace"
 	"github.com/gin-gonic/gin"
 	"go.opentelemetry.io/otel"
 	"gorm.io/driver/mysql"
@@ -54,7 +55,8 @@ func TestTrace(t *testing.T) {
 	}
 	eg := gin.New()
 
-	// eg.Use(gin)
+	eg.Use(gintrace.WithTrace())
+	// eg.Use(gin)go
 	eg.Run(":9090")
 	ctx, span := otel.Tracer("xx").Start(context.Background(), "begin")
 	// defer span.End()
@@ -86,7 +88,7 @@ func NewOrm() *gorm.DB {
 		panic(err)
 	}
 	// demo.FuckSomething()
-	_ = db.Use(&gt.TracePlugin{})
+	_ = db.Use(&gormtrace.TracePlugin{})
 	return db
 }
 
