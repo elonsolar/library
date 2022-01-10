@@ -1,4 +1,4 @@
-package gorm
+package gorm_trace
 
 import (
 	"go.opentelemetry.io/otel"
@@ -11,13 +11,13 @@ const (
 	callBackAfterName  = "opentracing:after"
 )
 
-type OpentracingPlugin struct{}
+type TracePlugin struct{}
 
-func (op *OpentracingPlugin) Name() string {
-	return "opentracingPlugin"
+func (op *TracePlugin) Name() string {
+	return "tracePlugin"
 }
 
-func (op *OpentracingPlugin) Initialize(db *gorm.DB) (err error) {
+func (op *TracePlugin) Initialize(db *gorm.DB) (err error) {
 	// 开始前 - 并不是都用相同的方法，可以自己自定义
 	db.Callback().Create().Before("gorm:before_create").Register(callBackBeforeName, before)
 	db.Callback().Query().Before("gorm:query").Register(callBackBeforeName, before)
@@ -36,8 +36,7 @@ func (op *OpentracingPlugin) Initialize(db *gorm.DB) (err error) {
 	return
 }
 
-// 告诉编译器这个结构体实现了gorm.Plugin接口
-var _ gorm.Plugin = &OpentracingPlugin{}
+var _ gorm.Plugin = &TracePlugin{}
 
 // 包内静态变量
 const gormSpanKey = "gorm"
